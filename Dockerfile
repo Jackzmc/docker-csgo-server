@@ -25,10 +25,12 @@ RUN chown -R $USER:$USER $SERVER && chmod +x $SERVER/*.sh
 
 USER $USER
 
-RUN curl http://media.steampowered.com/client/steamcmd_linux.tar.gz | tar -C /home/$USER -xz \
-    && /home/$USER/steamcmd.sh +login anonymous +force_install_dir $SERVER +app_update 740 +quit \
-    && mkdir -p /home/$USER/.steam/sdk32 /home/$USER/.steam/sdk64  \
-    && cp /home/$USER/linux32/steamclient.so /home/$USER/.steam/sdk32/steamclient.so
+RUN curl https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz | tar -C /home/$USER -xz \
+    && /home/$USER/steamcmd.sh +quit \
+    && mkdir -p /home/$USER/.steam/sdk32 /home/$USER/.steam/sdk64
+
+COPY  ./srcds-cache/ $SERVER
+RUN cp /home/$USER/linux32/steamclient.so /home/$USER/.steam/sdk32/steamclient.so
 COPY ./srcds_run $SERVER/srcds_run
 # srcds cant find steamclient.so, copy it locally && srcds_run has incorrect autorestart executable (uses steam.sh instead of steamcmd.sh)
 
